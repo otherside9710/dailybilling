@@ -15,17 +15,14 @@ use Illuminate\Support\Facades\Session;
 
 class AdminController extends Controller
 {
-
     public function __construct()
     {
         //$this->middleware('auth');
     }
-
     //login
     public function index(Request $request)
     {
         if ($request->isMethod('post')) {
-
             $mail = trim($request->email);
             $pass = trim($request->password);
 
@@ -47,28 +44,32 @@ class AdminController extends Controller
         return view('admin.index', ['id' => '']);
     }
 
-
     public function dashboard($id)
     {
-
         Session::remove('users');
-        $data = $this->getUserDataById($id);
-
-        return view('admin.panel',
-            [
-                'name' => $data->name,
-                'id' => $id,
-            ]
-        );
+        if (Session::get('isLogged') == 1){
+            $data = $this->getUserDataById($id);
+            return view('admin.panel',
+                [
+                    'name' => $data->name,
+                    'id' => $id,
+                ]
+            );
+        }else{
+            return view('admin.index',
+                [
+                    'id' => '',
+                    'info' => 'Debe Iniciar Sesion.',
+                ]
+            );
+        }
     }
-
 
     public function logout()
     {
         Session::flush();
         return view('admin.index', ['info' => 'Sesion Cerrada Correctamente!', 'id' => '']);
     }
-
 
     private function validateLogin($email, $pass)
     {
